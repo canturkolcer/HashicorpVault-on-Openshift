@@ -35,16 +35,16 @@ Here there are the instructions how to export data from Hashicorp Vault and rest
 3. Create migrate configuration.
 
     ```
-% oc rsh vault-0
-/ $ cat << 'EOF' > /tmp/backup.hcl
-storage_source "file" {
-  path = "/vault/data"
-}
+    % oc rsh vault-0
+    / $ cat << 'EOF' > /tmp/backup.hcl
+    storage_source "file" {
+    path = "/vault/data"
+    }
 
-storage_destination "file" {
-  path = "/tmp/backup"
-}
-EOF
+    storage_destination "file" {
+    path = "/tmp/backup"
+    }
+    EOF
     ```
    *** Important Note ***
    Please be sure you are using default path for Vault data. Default: /vault/data
