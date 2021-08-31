@@ -3,6 +3,7 @@
 - [HashiCorp Vault Upgrade With HELM on OCP4.x](#hashicorp-vault-upgrade-with-helm-on-ocp4x)
   - [Introduction](#introduction)
   - [Upgrade HashiCorp Vault on Openshift 4.x](#upgrade-hashicorp-vault-on-openshift-4x)
+  - [Rollback HashiCorp Vault on Openshift 4.x](#rollback-hashicorp-vault-on-openshift-4x)
 
 ## Introduction
 Upgrade Hashicorp Vault on Openshift 4.x using HELM
@@ -58,30 +59,30 @@ Topology:
 
 3. Check your Hashicorp Vault deployment and version
    
-   ```
-    % helm list
-    NAME     	NAMESPACE    	REVISION	UPDATED                              	STATUS  	CHART      	APP VERSION
-    vault-int	hashicorp-int	1       	2021-07-20 08:34:35.359349 +0200 CEST	deployed	vault-0.7.0	1.5.2
+  ```
+  % helm list
+  NAME     	NAMESPACE    	REVISION	UPDATED                              	STATUS  	CHART      	APP VERSION
+  vault-int	hashicorp-int	1       	2021-07-20 08:34:35.359349 +0200 CEST	deployed	vault-0.7.0	1.5.2
 
-    % helm history vault-int
-    REVISION	UPDATED                 	STATUS    	CHART       	APP VERSION	DESCRIPTION
-    1       	Mon Jul 19 16:03:54 2021	superseded	vault-0.7.0 	1.5.2      	Install complete
-   ```
+  % helm history vault-int
+  REVISION	UPDATED                 	STATUS    	CHART       	APP VERSION	DESCRIPTION
+  1       	Mon Jul 19 16:03:54 2021	superseded	vault-0.7.0 	1.5.2      	Install complete
+  ```
 
 4. Remove AutoUnseal solution from Statefull Set before upgrade.
-   ```
-   % oc edit statefulsets
-   ```
-   Remove following entries:
-   ```
-          lifecycle:
-            postStart:
-              exec:
-                command:
-                  - /bin/sh
-                  - '-c'
-                  - cat /etc/masterKey/master-key | xargs vault operator unseal   
-   ```
+  ```
+  % oc edit statefulsets
+  ```
+  Remove following entries:
+  ```
+        lifecycle:
+          postStart:
+            exec:
+              command:
+                - /bin/sh
+                - '-c'
+                - cat /etc/masterKey/master-key | xargs vault operator unseal   
+  ```
 5. Upgrade Hashicorp Vault. 
 
   ```
@@ -137,23 +138,23 @@ Topology:
 7. Unseal Vault and test from ansible tower.
    
 8. Add AutoUnseal solution from Statefull Set before upgrade and restart pod.
-   ```
-   % oc edit statefulsets
-   ```
-   Add following entries:
-   ```
-          lifecycle:
-            postStart:
-              exec:
-                command:
-                  - /bin/sh
-                  - '-c'
-                  - cat /etc/masterKey/master-key | xargs vault operator unseal 
-    ```
+  ```
+  % oc edit statefulsets
+  ```
+  Add following entries:
+  ```
+        lifecycle:
+          postStart:
+            exec:
+              command:
+                - /bin/sh
+                - '-c'
+                - cat /etc/masterKey/master-key | xargs vault operator unseal 
+  ```
 
-    ```
-    % oc delete pod vault-0
-    ```              
+  ```
+  % oc delete pod vault-0
+  ```              
 
 ## Rollback HashiCorp Vault on Openshift 4.x
 
