@@ -38,11 +38,11 @@ Here there are the instructions how to export data from Hashicorp Vault and rest
     % oc rsh vault-0
     / $ cat << 'EOF' > /tmp/backup.hcl
     storage_source "file" {
-    path = "/vault/data"
+      path = "/vault/data"
     }
 
     storage_destination "file" {
-    path = "/tmp/backup"
+      path = "/tmp/backup"
     }
     EOF
     ```

@@ -3,7 +3,6 @@
 - [HashiCorp Vault Upgrade With HELM on OCP4.x](#hashicorp-vault-upgrade-with-helm-on-ocp4x)
   - [Introduction](#introduction)
   - [Upgrade HashiCorp Vault on Openshift 4.x](#upgrade-hashicorp-vault-on-openshift-4x)
-  - [Rollback HashiCorp Vault on Openshift 4.x](#rollback-hashicorp-vault-on-openshift-4x)
 
 ## Introduction
 Upgrade Hashicorp Vault on Openshift 4.x using HELM
@@ -69,7 +68,21 @@ Topology:
     1       	Mon Jul 19 16:03:54 2021	superseded	vault-0.7.0 	1.5.2      	Install complete
    ```
 
-4. Upgrade Hashicorp Vault. 
+4. Remove AutoUnseal solution from Statefull Set before upgrade.
+   ```
+   % oc edit statefulsets
+   ```
+   Remove following entries:
+   ```
+          lifecycle:
+            postStart:
+              exec:
+                command:
+                  - /bin/sh
+                  - '-c'
+                  - cat /etc/masterKey/master-key | xargs vault operator unseal   
+   ```
+5. Upgrade Hashicorp Vault. 
 
   ```
   % helm  upgrade vault-int hashicorp/vault
@@ -121,7 +134,26 @@ Topology:
    ```  
 
 
-7. Unseal Vault and keep using.
+7. Unseal Vault and test from ansible tower.
+   
+8. Add AutoUnseal solution from Statefull Set before upgrade and restart pod.
+   ```
+   % oc edit statefulsets
+   ```
+   Add following entries:
+   ```
+          lifecycle:
+            postStart:
+              exec:
+                command:
+                  - /bin/sh
+                  - '-c'
+                  - cat /etc/masterKey/master-key | xargs vault operator unseal 
+    ```
+
+    ```
+    % oc delete pod vault-0
+    ```              
 
 ## Rollback HashiCorp Vault on Openshift 4.x
 
@@ -176,7 +208,22 @@ Topology:
 
    ```
 
-4. Rollback Hashicorp Vault. 
+4. Remove AutoUnseal solution from Statefull Set before upgrade.
+   ```
+   % oc edit statefulsets
+   ```
+   Remove following entries:
+   ```
+          lifecycle:
+            postStart:
+              exec:
+                command:
+                  - /bin/sh
+                  - '-c'
+                  - cat /etc/masterKey/master-key | xargs vault operator unseal   
+   ```
+
+5. Rollback Hashicorp Vault. 
 
   ```
   % helm rollback vault-int 1
@@ -184,7 +231,7 @@ Topology:
 
   ```
 
-5. Delete Hashicorp Vault pod to start it with previous version version
+6. Delete Hashicorp Vault pod to start it with previous version version
 
   ```
   % oc get pods
@@ -202,12 +249,29 @@ Topology:
 
   ```
 
-6. Confirm new version deployed or not.
+7. Confirm rolled back version deployed or not.
 
    ```
    % oc exec vault-int-0 vault status | grep Version
     Version         1.5.2
    ```  
 
-
-7. Unseal Vault and keep using.
+8. Unseal Vault and test from ansible tower.
+   
+9. Add AutoUnseal solution to Statefull Set and restart pod.
+   ```
+   % oc edit statefulsets
+   ```
+   Add following entries:
+   ```
+          lifecycle:
+            postStart:
+              exec:
+                command:
+                  - /bin/sh
+                  - '-c'
+                  - cat /etc/masterKey/master-key | xargs vault operator unseal 
+    ```
+    ```
+    % oc delete pod vault-0
+    ```
