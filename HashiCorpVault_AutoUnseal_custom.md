@@ -22,7 +22,7 @@ lifecycle:
       command:
         - /bin/sh
         - '-c'
-        - cat /etc/masterKey/master-key | xargs vault operator unseal
+        - sleep 30 && cat /etc/masterKey/master-key | xargs vault operator unseal
 .....
 
 volumeMounts:
